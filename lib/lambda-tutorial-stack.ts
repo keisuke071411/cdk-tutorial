@@ -1,19 +1,17 @@
-import { Duration, Stack, StackProps } from 'aws-cdk-lib';
-import * as sns from 'aws-cdk-lib/aws-sns';
-import * as subs from 'aws-cdk-lib/aws-sns-subscriptions';
-import * as sqs from 'aws-cdk-lib/aws-sqs';
-import { Construct } from 'constructs';
+import * as cdk from '@aws-cdk/core';
+import * as lambda from '@aws-cdk/aws-lambda';
+import { NodejsFunction } from "@aws-cdk/aws-lambda-nodejs";
+import * as path from "path"
 
-export class LambdaTutorialStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+export class LambdaTutorialStack extends cdk.Stack {
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const queue = new sqs.Queue(this, 'LambdaTutorialQueue', {
-      visibilityTimeout: Duration.seconds(300)
+    // defines an AWS Lambda resource
+    const hello = new NodejsFunction(this, 'HelloHandler', {
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: 'handler',
+      entry: path.join(__dirname, "/../lambda/hello.ts")
     });
-
-    const topic = new sns.Topic(this, 'LambdaTutorialTopic');
-
-    topic.addSubscription(new subs.SqsSubscription(queue));
   }
 }
